@@ -15,8 +15,8 @@ trap error_handler ERR
 
 
 URL="${1:-}"
-HTML="/tmp/gdrive_probe.html"
-COOKIE="/tmp/gdrive_cookie.txt"
+HTML="/tmp/gdrive_probe_$$.html"
+COOKIE="/tmp/gdrive_cookie_$$.txt"
 
 trap 'rm -f "$HTML" "$COOKIE"' EXIT
 
@@ -50,6 +50,6 @@ if [[ -n "$CONFIRM" ]]; then
   echo "Downloading with Confirmation Token"
   wget -q --show-progress --content-disposition --load-cookies "$COOKIE" "https://drive.usercontent.google.com/download?id=${ID}&confirm=${CONFIRM}&export=download"
 else
-  echo "Downloading withtout Confirmation Token"
+  echo "Downloading without Confirmation Token"
   wget -q --show-progress --content-disposition --load-cookies "$COOKIE" "https://drive.usercontent.google.com/download?id=${ID}&export=download"
 fi
