@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 error_handler() {
@@ -17,6 +17,8 @@ trap error_handler ERR
 URL="${1:-}"
 HTML="/tmp/gdrive_probe.html"
 COOKIE="/tmp/gdrive_cookie.txt"
+
+trap 'rm -f "$HTML" "$COOKIE"' EXIT
 
 if [[ -z "$URL" ]]; then
   echo "Usage: $0 <google_drive_url>"
@@ -38,7 +40,7 @@ DOWNLOAD="https://drive.usercontent.google.com/download?id=${ID}&export=download
 
 wget -qO "$HTML" --save-cookies "$COOKIE" --keep-session-cookies "$DOWNLOAD"
 
-if file -b --mime-type "$HTML" | grep -qE 'text/|application/xhtml\+xml|application/xml'; then
+if file -b --mime-type "$HTML" | grep -qE 'text/|application/xhtml\+xml'; then
   CONFIRM="$(sed -n 's/.*name="confirm" value="\([^"]*\)".*/\1/p' "$HTML" | head -n1)"
 else
   CONFIRM=""
@@ -51,7 +53,3 @@ else
   echo "Downloading withtout Confirmation Token"
   wget -q --show-progress --content-disposition --load-cookies "$COOKIE" "https://drive.usercontent.google.com/download?id=${ID}&export=download"
 fi
-
-truncate -s 0 $HTML
-truncate -s 0 $COOKIE
-
