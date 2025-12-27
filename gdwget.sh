@@ -38,7 +38,14 @@ echo "File's ID: $ID"
 
 DOWNLOAD="https://drive.usercontent.google.com/download?id=${ID}&export=download"
 
+echo "The download URL ${DOWNLOAD}"
+
 wget -qO "$HTML" --save-cookies "$COOKIE" --keep-session-cookies "$DOWNLOAD"
+
+if grep -qiE 'accounts\.google\.com/(v3/)?signin|ServiceLogin' "$HTML"; then
+  echo "Check the File Permissions (requires sign-in)."
+  exit 1
+fi
 
 if file -b --mime-type "$HTML" | grep -qE 'text/|application/xhtml\+xml'; then
   CONFIRM="$(sed -n 's/.*name="confirm" value="\([^"]*\)".*/\1/p' "$HTML" | head -n1)"
